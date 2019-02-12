@@ -24,17 +24,31 @@ def webhook_post():
     body = request.get_json()
     if body["object"] == "page":
         for entry in body["entry"]:
-            msg = entry["messaging"][0]
-            sender_id = msg["sender"]["id"]
-            message = msg.get("message")
-            if message is not None:
-                if cache.check_in_cache(message["mid"]):
-                    continue
-                cache.put(message["mid"])
-                if User.check_exist(sender_id):
-                    user = User(sender_id)
-                    user.process_message(message["text"])
-                else:
-                    user = User(sender_id, create_new=True)
-                    user.send_text_message("You're new. Welcome")
+            for msg in entry["messaging"]:
+                sender_id = msg["sender"]["id"]
+                postback = msg.get("postback")
+                if postback is not None:
+                    if User.check_exist(sender_id):
+                        user = User(sender_id)
+                        user.process_postback(postback["postback"]["payload"])
+                    else:
+                        user = User(sender_id, create_new=True)
+                        user.send_bot_message("Chào mừng", "Chào mừng bạn đã đến với CSP Heartsync")
+                        user.show_menu()
+                message = msg.get("message")
+                if message is not None:
+                    if cache.check_in_cache(message["mid"]):
+                        continue
+                    cache.put(message["mid"])
+                    if User.check_exist(sender_id):
+                        user = User(sender_id)
+                        if "text" in message:
+                            user.process_message(message["text"])
+                        else:
+                            for attachment in message["attachments"]:
+                                user.process_message((attachment["type"], attachment["payload"]["url"]))
+                    else:
+                        user = User(sender_id, create_new=True)
+                        user.send_bot_message("Chào mừng", "Chào mừng bạn đã đến với CSP Heartsync")
+                        user.show_menu()
     return "EVENT_RECEIVED", 200

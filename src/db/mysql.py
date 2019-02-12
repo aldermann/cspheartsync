@@ -33,4 +33,3 @@ def create_cursor(**kwargs):
 
 def commit_change():
     cnx.commit()
-    print("connection committed")

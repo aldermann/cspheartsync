@@ -12,13 +12,17 @@ class APIInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def send_message(self, recipient_id, payload):
+    def send(self, recipient_id, payload):
         raise NotImplementedError
 
     @abstractmethod
-    def send_text_message(self, recipient, message):
+    def send_text_message(self, recipient, message, quick_replies):
         raise NotImplementedError
 
     @abstractmethod
     def send_attachment(self, recipient, content_type, content):
+        raise NotImplementedError
+
+    @abstractmethod
+    def send_generic_template(self, recipient, elements):
         raise NotImplementedError

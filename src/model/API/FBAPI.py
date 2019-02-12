@@ -18,7 +18,7 @@ class FBAPI(APIInterface):
         url_parts[4] = urlparser.urlencode(query)
         return urlparser.urlunparse(url_parts)
 
-    def send_message(self, recipient_id, payload):
+    def send(self, recipient_id, payload):
         url = self.get_url("/me/messages")
         data = {
             "messaging_type": "RESPONSE",
@@ -35,18 +35,32 @@ class FBAPI(APIInterface):
         response = requests.get(url)
         return response.json()
 
-    def send_text_message(self, recipient, message):
-        return self.send_message(recipient, {
+    def send_text_message(self, recipient, message, quick_replies):
+        data = {
             "text": message
-        })
+        }
+        if quick_replies is not None:
+            data["quick_replies"] = quick_replies
+        return self.send(recipient, data)
 
     def send_attachment(self, recipient, content_type, content):
-        return self.send_message(recipient, {
+        return self.send(recipient, {
             "attachment": {
                 "type": content_type,
                 "payload": {
                     "url": content,
                     "is_reusable": True
+                }
+            }
+        })
+
+    def send_generic_template(self, recipient, elements):
+        return self.send(recipient, {
+            "attachment": {
+                "type":  "template",
+                "payload": {
+                    "template_type": "generic",
+                    "elements": elements
                 }
             }
         })
