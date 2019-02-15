@@ -1,4 +1,6 @@
-from model.User.MessageUser import MessageUser, make_quick_replies
+import const.postback_name as postback_name
+import const.context_name as context_name
+from model.User.MessageUser import MessageUser
 
 
 class User(MessageUser):
@@ -12,30 +14,30 @@ class User(MessageUser):
     def pair(self):
         partner_id = User.lookup()
         if partner_id is None:
-            self.bot_context = "queuing"
+            self.bot_context = context_name.queuing
             self.save()
-            self.send_bot_message("Tìm cặp", "Hãy đợi một chút để bot tìm cặp cho bạn")
+            self.start_queuing()
         else:
             self.partner = partner_id
-            self.bot_context = "chatting"
-            self.send_bot_message("Đã ghép cặp", "Hãy bắt đầu cuộc trò chuyện của bạn")
+            self.bot_context = context_name.chatting
+            self.start_chatting()
             self.save()
             partner = User(partner_id)
             partner.partner = self.messenger_id
-            partner.bot_context = "chatting"
-            partner.send_bot_message("Đã ghép cặp", "Hãy bắt đầu cuộc trò chuyện của bạn")
+            partner.bot_context = context_name.chatting
+            partner.start_chatting()
             partner.save()
 
     def unpair(self):
         partner = User(self.partner)
         partner.partner = None
-        partner.bot_context = "home"
-        partner.send_bot_message("Kết thúc", "Cuộc trò chuyện đã kết thúc")
+        partner.bot_context = context_name.home
+        partner.stop_chatting(False)
         partner.show_menu()
         partner.save()
         self.partner = None
-        self.bot_context = "home"
-        self.send_bot_message("Kết thúc", "Bạn đã kết thúc cuộc trò chuyện")
+        self.bot_context = context_name.home
+        self.stop_chatting(True)
         self.show_menu()
         self.save()
 
@@ -48,41 +50,52 @@ class User(MessageUser):
         partner.send_attachment(content_type, content)
 
     def process_message(self, message):
-        if self.bot_context == "home":
+        if self.bot_context == context_name.home:
             self.pair()
-        elif self.bot_context == "chatting":
-            if message == "end_chat":
-                self.unpair()
+        elif self.bot_context == context_name.chatting:
+            if message.lower() == "end chat":
+                self.show_end()
             else:
                 if isinstance(message, tuple):
                     self.forward_attachment(message[0], message[1])
                 self.forward_text_message(message)
-        elif self.bot_context == "queuing":
+        elif self.bot_context == context_name.queuing:
             if message == "cancel":
-                self.bot_context = "home"
-                self.send_bot_message("Hủy tìm kiếm", "Bạn đã hủy việc tìm kiếm người trò chuyện")
-                self.show_menu()
+                self.bot_context = context_name.home
+                self.stop_queuing()
                 self.save()
             else:
-                self.send_bot_message("Hãy chờ đợi", "Chúng tôi đang tìm kiếm cho bạn người trò chuyện")
+                self.still_queuing()
 
     def process_postback(self, postback):
-        if self.bot_context == "home":
-            if postback == "START_CHATTING":
+
+        if postback == postback_name.get_started:
+            self.bot_context = context_name.home
+            self.show_menu()
+            self.save()
+
+        elif postback == postback_name.get_help:
+            self.show_help()
+
+        elif self.bot_context == context_name.home:
+            if postback == postback_name.start_chatting:
                 self.pair()
-            elif postback == "HELP":
-                self.show_help()
-            elif postback == "SET_FAVOURITE":
+            elif postback == postback_name.set_favourite:
                 self.show_gender_list()
             elif postback[0:7] == "FAVOUR_":
                 self.favourite = postback[7:].lower()
                 self.save()
 
-        elif self.bot_context == "chatting" and postback == "STOP_CHATTING":
-            self.unpair()
+        elif self.bot_context == context_name.chatting:
+            if postback == postback_name.stop_chatting:
+                self.unpair()
+            elif postback == postback_name.request_stop_chatting:
+                self.show_end()
 
-        elif self.bot_context == "queuing" and postback == "CANCEL_QUEUING":
-            self.bot_context = "home"
-            self.send_bot_message("Hủy tìm kiếm", "Bạn đã hủy việc tìm kiếm người trò chuyện")
-            self.show_menu()
-            self.save()
+        elif self.bot_context == context_name.queuing:
+            if postback == postback_name.cancel_queuing:
+                self.bot_context = context_name.home
+                self.stop_queuing()
+                self.save()
+            else:
+                self.still_queuing()

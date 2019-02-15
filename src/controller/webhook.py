@@ -27,28 +27,33 @@ def webhook_post():
             for msg in entry["messaging"]:
                 sender_id = msg["sender"]["id"]
                 postback = msg.get("postback")
+                print(msg)
+                if "message" in msg and "quick_reply" in msg["message"]:
+                    postback = msg["message"]["quick_reply"]
+                    print(postback)
                 if postback is not None:
                     if User.check_exist(sender_id):
                         user = User(sender_id)
-                        user.process_postback(postback["postback"]["payload"])
+                        user.process_postback(postback["payload"])
                     else:
                         user = User(sender_id, create_new=True)
                         user.send_bot_message("Chào mừng", "Chào mừng bạn đã đến với CSP Heartsync")
                         user.show_menu()
-                message = msg.get("message")
-                if message is not None:
-                    if cache.check_in_cache(message["mid"]):
-                        continue
-                    cache.put(message["mid"])
-                    if User.check_exist(sender_id):
-                        user = User(sender_id)
-                        if "text" in message:
-                            user.process_message(message["text"])
+                else:
+                    message = msg.get("message")
+                    if message is not None:
+                        if cache.check_in_cache(message["mid"]):
+                            continue
+                        cache.put(message["mid"])
+                        if User.check_exist(sender_id):
+                            user = User(sender_id)
+                            if "text" in message:
+                                user.process_message(message["text"])
+                            else:
+                                for attachment in message["attachments"]:
+                                    user.process_message((attachment["type"], attachment["payload"]["url"]))
                         else:
-                            for attachment in message["attachments"]:
-                                user.process_message((attachment["type"], attachment["payload"]["url"]))
-                    else:
-                        user = User(sender_id, create_new=True)
-                        user.send_bot_message("Chào mừng", "Chào mừng bạn đã đến với CSP Heartsync")
-                        user.show_menu()
+                            user = User(sender_id, create_new=True)
+                            user.send_bot_message("Chào mừng", "Chào mừng bạn đã đến với CSP Heartsync")
+                            user.show_menu()
     return "EVENT_RECEIVED", 200

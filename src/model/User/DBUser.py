@@ -1,5 +1,6 @@
 import db.mysql as db
 from model.API import FBAPI
+import const.context_name as context_name
 
 
 class DBUser:
@@ -8,7 +9,7 @@ class DBUser:
     full_name = "John Doe"
     gender = "male"
     favourite = "any"
-    bot_context = "home"
+    bot_context = context_name.home
     partner = None
 
     _API = None
@@ -65,13 +66,14 @@ class DBUser:
         query = """
                     insert into user 
                           (messenger_id, full_name, gender, avatar, favourite, partner, bot_context) 
-                    values (%(messenger_id)s, %(full_name)s, %(gender)s, %(avatar)s, 'any', NULL, 'home');
+                    values (%(messenger_id)s, %(full_name)s, %(gender)s, %(avatar)s, 'any', NULL, %(context)s);
                 """
         data = {
             "messenger_id": self.messenger_id,
             "full_name": self.full_name,
             "gender": self.gender,
-            "avatar": self.avatar
+            "avatar": self.avatar,
+            "context": context_name.home
         }
         cursor.execute(query, data)
         db.commit_change()
@@ -89,7 +91,7 @@ class DBUser:
     @staticmethod
     def lookup():
         cursor = db.create_cursor()
-        cursor.execute("select messenger_id from user where bot_context = 'queuing'")
+        cursor.execute("select messenger_id from user where bot_context = '{}'".format(context_name.queuing))
         data = db.fetch_data(cursor)
         cursor.close()
         if len(data) == 0:

@@ -1,6 +1,6 @@
 import os
 import urllib.parse as urlparser
-
+import const.postback_name as postback
 import requests
 
 from model.API import APIInterface
@@ -28,23 +28,29 @@ class FBAPI(APIInterface):
             "message": payload
         }
         response = requests.post(url, json=data)
+        if response.status_code != 200:
+            raise Exception(response.text, data)
         return response.json()
 
     def get_user_data(self, messenger_id):
         url = self.get_url("/{}?fields=first_name,last_name,profile_pic,gender".format(messenger_id))
         response = requests.get(url)
+        if response.status_code != 200:
+            raise Exception(response.text)
         return response.json()
 
-    def send_text_message(self, recipient, message, quick_replies):
+    def send_text_message(self, recipient, message, quick_replies=None):
         data = {
             "text": message
         }
         if quick_replies is not None:
+            if not isinstance(quick_replies, list):
+                quick_replies = [quick_replies]
             data["quick_replies"] = quick_replies
         return self.send(recipient, data)
 
-    def send_attachment(self, recipient, content_type, content):
-        return self.send(recipient, {
+    def send_attachment(self, recipient, content_type, content, quick_replies=None):
+        data = {
             "attachment": {
                 "type": content_type,
                 "payload": {
@@ -52,15 +58,50 @@ class FBAPI(APIInterface):
                     "is_reusable": True
                 }
             }
-        })
+        }
+        if quick_replies is not None:
+            if not isinstance(quick_replies, list):
+                quick_replies = [quick_replies]
+            data["quick_replies"] = quick_replies
+        return self.send(recipient, data)
 
-    def send_generic_template(self, recipient, elements):
-        return self.send(recipient, {
+    def send_generic_template(self, recipient, elements, quick_replies=None):
+        data = {
             "attachment": {
-                "type":  "template",
+                "type": "template",
                 "payload": {
                     "template_type": "generic",
                     "elements": elements
                 }
             }
-        })
+        }
+        if quick_replies is not None:
+            if not isinstance(quick_replies, list):
+                quick_replies = [quick_replies]
+            data["quick_replies"] = quick_replies
+        return self.send(recipient, data)
+
+    def setup_getstarted(self):
+        url = self.get_url("/me/messenger_profile")
+        data = {
+            "get_started": {
+                "payload": postback.get_started
+            },
+            "persistent_menu": [
+                {
+                    "locale": "default",
+                    "composer_input_disabled": False,
+                    "call_to_actions": [
+                        {
+                            "type": "postback",
+                            "title": "End Chat",
+                            "payload": postback.request_stop_chatting
+                        }
+                    ]
+                }
+            ]
+
+        }
+        response = requests.post(url, json=data)
+        if response.status_code != 200:
+            raise Exception(response.text)

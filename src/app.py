@@ -1,10 +1,15 @@
 from flask import Flask
 from dotenv import load_dotenv
+import sys
 
 load_dotenv()
-
+from model.API.FBAPI import FBAPI
 from controller.webhook import webhook_blueprint
 
+if len(sys.argv) >= 2 and sys.argv[1] == "setup":
+    API = FBAPI()
+    API.setup_getstarted()
+    exit(0)
 app = Flask(__name__)
 app.register_blueprint(webhook_blueprint)
 
