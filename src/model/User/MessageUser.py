@@ -1,5 +1,5 @@
-from model.User.DBUser import DBUser
 import const.postback_name as postback_name
+from model.User.DBUser import DBUser
 
 
 def make_button(title, payload):
@@ -38,7 +38,36 @@ class MessageUser(DBUser):
         self._API.send_generic_template(self.messenger_id, [element], quick_replies=quick_replies)
 
     def show_help(self):
-        pass
+        elements = [{
+            "title": "Bắt đầu chat",
+            "subtitle": "Bấm vào nút hoặc nhắn một câu bất kỳ để tìm bạn.",
+            "image_url": "https://res.cloudinary.com/aldermann/image/upload/v1550310551/start.png"
+        }, {
+            "title": "Dừng tìm kiếm",
+            "subtitle": 'Bấm vào nút hoặc gõ "cancel" để ngừng tìm kiếm',
+            "image_url": "https://res.cloudinary.com/aldermann/image/upload/v1550311539/cancel.png"
+        }, {
+            "title": "Bắt đầu cuộc trò chuyện",
+            "subtitle": "Khi bot đã tìm được bạn cho bạn, bạn có thể bắt đầu nhắn tin",
+            "image_url": "https://res.cloudinary.com/aldermann/image/upload/v1550312941/paired.png"
+        }, {
+            "title": "Kết thúc cuộc trò chuyện",
+            "subtitle": 'Bấm vào nút trong menu hoặc gõ "end chat" để kết thúc',
+            "image_url": "https://res.cloudinary.com/aldermann/image/upload/v1550313298/end.png"
+        }, {
+            "title": "Thay đổi sở thích",
+            "subtitle": "Chọn để thay đổi giới tính của người bạn muốn được ghép cặp",
+            "image_url": "https://res.cloudinary.com/aldermann/image/upload/v1550313479/change.png"
+        }, {
+            "title": "Tìm bạn thôi",
+            "subtitle": "Hi vọng bạn sẽ có những cuộc trò chuyện đầy ý nghĩa trên CSP Heartsync",
+            "image_url": "https://res.cloudinary.com/aldermann/image/upload/c_scale,w_250/v1550313784/pic.png",
+            "buttons": [
+                make_button("Về Menu", postback_name.show_menu)
+            ]
+        }
+        ]
+        self._API.send_generic_template(self.messenger_id, elements)
 
     def show_menu(self):
         element = {

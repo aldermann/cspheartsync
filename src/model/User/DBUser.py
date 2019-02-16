@@ -89,9 +89,21 @@ class DBUser:
         return res
 
     @staticmethod
-    def _lookup():
+    def _lookup(gender, favourite):
         cursor = db.create_cursor()
-        cursor.execute("select messenger_id from user where bot_context = '{}'".format(context_name.queuing))
+        query = """
+        select messenger_id from user 
+            where bot_context = %(context)s 
+            and (favourite = 'any' or favourite = %(gender)s)
+        """
+        if favourite != "any":
+            query += "and gender = %(favourite)s"
+        data = {
+            "context": context_name.queuing,
+            "gender": gender,
+            "favourite": favourite
+        }
+        cursor.execute(query, data)
         data = db.fetch_data(cursor)
         cursor.close()
         if len(data) == 0:

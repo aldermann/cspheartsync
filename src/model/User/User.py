@@ -13,7 +13,7 @@ class User(MessageUser):
         super().__init__(user_messenger_id)
 
     def pair(self):
-        partner_id = User._lookup()
+        partner_id = User._lookup(self.gender, self.favourite)
         if partner_id is None:
             self.bot_context = context_name.queuing
             self.save()
@@ -69,7 +69,8 @@ class User(MessageUser):
                 self.still_queuing()
 
     def process_postback(self, postback):
-
+        if postback == postback_name.show_menu:
+            self.show_menu()
         if postback == postback_name.get_started:
             self.bot_context = context_name.home
             self.show_menu()
@@ -86,6 +87,7 @@ class User(MessageUser):
             elif postback[0:7] == "FAVOUR_":
                 self.favourite = postback[7:].lower()
                 self.changed_favourite(self.favourite)
+                self.show_menu()
                 self.save()
 
         elif self.bot_context == context_name.chatting:

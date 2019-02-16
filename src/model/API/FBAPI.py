@@ -94,7 +94,7 @@ class FBAPI(APIInterface):
                     "call_to_actions": [
                         {
                             "type": "postback",
-                            "title": "End Chat",
+                            "title": "Dừng trò chuyện",
                             "payload": postback.request_stop_chatting
                         }
                     ]

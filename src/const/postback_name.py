@@ -1,4 +1,5 @@
 stop_chatting = "STOP_CHATTING"
+show_menu = "SHOW_MENU"
 request_stop_chatting = "REQUEST_STOP_CHATTING"
 start_chatting = "START_CHATTING"
 get_started = "GET_STARTED"
