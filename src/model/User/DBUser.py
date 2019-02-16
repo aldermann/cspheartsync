@@ -1,6 +1,6 @@
+import const.context_name as context_name
 import db.mysql as db
 from model.API import FBAPI
-import const.context_name as context_name
 
 
 class DBUser:
@@ -29,7 +29,7 @@ class DBUser:
             for key in data[0]:
                 self.__dict__[key] = data[0][key]
 
-    def fetch_user_data(self):
+    def _fetch_user_data_from_facebook(self):
         data = self._API.get_user_data(self.messenger_id)
         self.full_name = data["first_name"] + " " + data["last_name"]
         self.avatar = data["profile_pic"]
@@ -89,7 +89,7 @@ class DBUser:
         return res
 
     @staticmethod
-    def lookup():
+    def _lookup():
         cursor = db.create_cursor()
         cursor.execute("select messenger_id from user where bot_context = '{}'".format(context_name.queuing))
         data = db.fetch_data(cursor)

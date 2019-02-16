@@ -7,12 +7,13 @@ class User(MessageUser):
     def __init__(self, user_messenger_id, create_new=False):
         if create_new:
             super().__init__(user_messenger_id, False)
-            self.fetch_user_data()
+            self._fetch_user_data_from_facebook()
             self._insert_user()
+            self.send_bot_message("Chào mừng", "Chào mừng bạn đã đến với CSP Heartsync")
         super().__init__(user_messenger_id)
 
     def pair(self):
-        partner_id = User.lookup()
+        partner_id = User._lookup()
         if partner_id is None:
             self.bot_context = context_name.queuing
             self.save()
@@ -84,6 +85,7 @@ class User(MessageUser):
                 self.show_gender_list()
             elif postback[0:7] == "FAVOUR_":
                 self.favourite = postback[7:].lower()
+                self.changed_favourite(self.favourite)
                 self.save()
 
         elif self.bot_context == context_name.chatting:

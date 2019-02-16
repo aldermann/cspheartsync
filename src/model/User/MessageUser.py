@@ -88,3 +88,11 @@ class MessageUser(DBUser):
             self.send_bot_message("Kết thúc", "Bạn đã kết thúc cuộc trò chuyện")
         else:
             self.send_bot_message("Kết thúc", "Cuộc trò chuyện đã kết thúc")
+
+    def changed_favourite(self, gender):
+        response = {
+            "male": "các bạn nam",
+            "female": "các bạn nữ",
+            "any": "cả các bạn nam và nữ"
+        }
+        self.send_bot_message("Thay đổi sở thích", "Bạn sẽ được ghép cặp với " + response[gender])

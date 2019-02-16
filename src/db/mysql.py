@@ -14,11 +14,18 @@ cursor.execute("""create table if not exists `user` (
                        `gender` enum('male', 'female') not NULL default 'male',
                        `avatar` varchar(256) not NULL,
                        `favourite` enum('male', 'female', 'any') not NULL default 'any',
-                       `partner` int(15) ,
+                       `partner` bigint(15) ,
                        `bot_context` varchar(64) default 'home',
                        primary key (`messenger_id`)
                    );
                    """)
+
+# cursor.execute("""create table if not exists `log` (
+#                        'log_id' int(8) not NULL auto_increment,
+#                        'message' varchar(512) not NULL,
+#                        primary key (`log_id`)
+#                    );
+#                    """)
 
 
 def fetch_data(cur):
