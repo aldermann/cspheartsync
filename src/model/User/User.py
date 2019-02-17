@@ -69,6 +69,7 @@ class User(MessageUser):
                 self.still_queuing()
 
     def process_postback(self, postback):
+        print(postback)
         if postback == postback_name.get_started:
             self.bot_context = context_name.home
             self.show_menu()
@@ -101,7 +102,7 @@ class User(MessageUser):
                 self.send_bot_message("Không phải bây giờ", "Hãy cài đặt sau khi kết thúc cuộc trò chuyện")
 
         elif self.bot_context == context_name.queuing:
-            if postback == postback_name.cancel_queuing:
+            if postback == postback_name.cancel_queuing or postback == postback_name.request_stop_chatting:
                 self.bot_context = context_name.home
                 self.stop_queuing()
                 self.save()

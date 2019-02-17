@@ -74,7 +74,7 @@ class MessageUser(DBUser):
                     make_button("Về Menu", postback_name.show_menu)
                 ]
             }
-            self._API.send_generic_template(self.messenger_id, elements)
+        self._API.send_generic_template(self.messenger_id, elements)
 
     def show_menu(self):
         element = {
