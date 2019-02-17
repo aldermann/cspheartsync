@@ -89,8 +89,6 @@ class User(MessageUser):
                 self.changed_favourite(self.favourite)
                 self.show_menu()
                 self.save()
-            else:
-                self.show_menu()
 
         elif self.bot_context == context_name.chatting:
             if postback == postback_name.stop_chatting:
