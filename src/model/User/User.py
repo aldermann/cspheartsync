@@ -81,7 +81,7 @@ class User(MessageUser):
         elif self.bot_context == context_name.home:
             if postback == postback_name.show_menu:
                 self.show_menu()
-            if postback == postback_name.start_chatting:
+            elif postback == postback_name.start_chatting:
                 self.pair()
             elif postback == postback_name.set_favourite:
                 self.show_gender_list()
