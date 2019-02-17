@@ -4,7 +4,8 @@ from mysql.connector import connect
 user = os.getenv("DB_USERNAME") or "aldermann"
 password = os.getenv("DB_PASSWORD") or "123"
 host = os.getenv("DB_URL") or "127.0.0.1"
-cnx = connect(user=user, password=password, host=host, database="cspheartsync")
+db_name = os.getenv("DB_NAME") or "cspheartsync"
+cnx = connect(user=user, password=password, host=host, database=db_name)
 
 cursor = cnx.cursor()
 
