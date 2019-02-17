@@ -54,11 +54,11 @@ class User(MessageUser):
         if self.bot_context == context_name.home:
             self.pair()
         elif self.bot_context == context_name.chatting:
-            if message.lower() == "end chat":
-                self.show_end()
+            if isinstance(message, tuple):
+                self.forward_attachment(message[0], message[1])
             else:
-                if isinstance(message, tuple):
-                    self.forward_attachment(message[0], message[1])
+                if message.lower() == "end chat":
+                    self.show_end()
                 self.forward_text_message(message)
         elif self.bot_context == context_name.queuing:
             if message == "cancel":
