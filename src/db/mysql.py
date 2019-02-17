@@ -1,32 +1,40 @@
 import os
-from mysql.connector import connect
 
-user = os.getenv("DB_USERNAME") or "aldermann"
-password = os.getenv("DB_PASSWORD") or "123"
-host = os.getenv("DB_URL") or "127.0.0.1"
-db_name = os.getenv("DB_NAME") or "cspheartsync"
-cnx = connect(user=user, password=password, host=host, database=db_name)
+from mysql.connector import OperationalError
+from mysql.connector.pooling import MySQLConnectionPool, MySQLConnection
 
-cursor = cnx.cursor()
+conf = {
+    "user": os.getenv("DB_USERNAME") or "aldermann",
+    "password": os.getenv("DB_PASSWORD") or "123",
+    "host": os.getenv("DB_URL") or "127.0.0.1",
+    "database": os.getenv("DB_NAME") or "cspheartsync"
+}
 
-cursor.execute("""create table if not exists `user` (
-                       `messenger_id` bigint(15) not NULL ,
-                       `full_name` varchar (64) character set utf8 not NULL default 'John Doe',
-                       `gender` enum('male', 'female') not NULL default 'male',
-                       `avatar` varchar(256) not NULL,
-                       `favourite` enum('male', 'female', 'any') not NULL default 'any',
-                       `partner` bigint(15) ,
-                       `bot_context` varchar(64) default 'home',
-                       primary key (`messenger_id`)
-                   );
-                   """)
+pool = MySQLConnectionPool(4, "heartsync", **conf)
 
-# cursor.execute("""create table if not exists `log` (
-#                        'log_id' int(8) not NULL auto_increment,
-#                        'message' varchar(512) not NULL,
-#                        primary key (`log_id`)
-#                    );
-#                    """)
+
+def init():
+    cnx = pool.get_connection()
+    cursor = cnx.cursor()
+
+    cursor.execute("""create table if not exists `user` (
+                           `messenger_id` bigint(15) not NULL ,
+                           `full_name` varchar (64) character set utf8 not NULL default 'John Doe',
+                           `gender` enum('male', 'female') not NULL default 'male',
+                           `avatar` varchar(256) not NULL,
+                           `favourite` enum('male', 'female', 'any') not NULL default 'any',
+                           `partner` bigint(15) ,
+                           `bot_context` varchar(64) default 'home',
+                           primary key (`messenger_id`)
+                       );
+                       """)
+
+    # cursor.execute("""create table if not exists `log` (
+    #                        'log_id' int(8) not NULL auto_increment,
+    #                        'message' varchar(512) not NULL,
+    #                        primary key (`log_id`)
+    #                    );
+    #                    """)
 
 
 def fetch_data(cur):
@@ -35,9 +43,22 @@ def fetch_data(cur):
     return rows
 
 
-def create_cursor(**kwargs):
-    return cnx.cursor(**kwargs)
+def get_connection():
+    """
+    :return: a connection
+    :rtype: MySQLConnection
+    """
+    return pool.get_connection()
 
 
-def commit_change():
-    cnx.commit()
+def execute_query(cursor, cnx, query, data):
+    try:
+        # print("executing query", query)
+        cursor.execute(query, data)
+    except OperationalError:
+        print("restarting connection")
+        cnx.reconnect()
+        cursor.execute(query, data)
+
+
+init()
