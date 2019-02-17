@@ -96,6 +96,11 @@ class FBAPI(APIInterface):
                             "type": "postback",
                             "title": "Dừng trò chuyện",
                             "payload": postback.request_stop_chatting
+                        },
+                        {
+                            "type": "postback",
+                            "title": "Hướng dẫn",
+                            "payload": postback.get_help
                         }
                     ]
                 }

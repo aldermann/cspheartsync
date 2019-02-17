@@ -1,4 +1,5 @@
 import const.postback_name as postback_name
+from const import context_name
 from model.User.DBUser import DBUser
 
 
@@ -62,12 +63,18 @@ class MessageUser(DBUser):
             "title": "Tìm bạn thôi",
             "subtitle": "Hi vọng bạn sẽ có những cuộc trò chuyện đầy ý nghĩa trên CSP Heartsync",
             "image_url": "https://res.cloudinary.com/aldermann/image/upload/c_scale,w_250/v1550313784/pic.png",
-            "buttons": [
-                make_button("Về Menu", postback_name.show_menu)
-            ]
         }
         ]
-        self._API.send_generic_template(self.messenger_id, elements)
+        if self.bot_context == context_name.home:
+            elements[5] = {
+                "title": "Tìm bạn thôi",
+                "subtitle": "Hi vọng bạn sẽ có những cuộc trò chuyện đầy ý nghĩa trên CSP Heartsync",
+                "image_url": "https://res.cloudinary.com/aldermann/image/upload/c_scale,w_250/v1550313784/pic.png",
+                "buttons": [
+                    make_button("Về Menu", postback_name.show_menu)
+                ]
+            }
+            self._API.send_generic_template(self.messenger_id, elements)
 
     def show_menu(self):
         element = {

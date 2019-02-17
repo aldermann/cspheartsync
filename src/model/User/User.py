@@ -69,8 +69,6 @@ class User(MessageUser):
                 self.still_queuing()
 
     def process_postback(self, postback):
-        if postback == postback_name.show_menu:
-            self.show_menu()
         if postback == postback_name.get_started:
             self.bot_context = context_name.home
             self.show_menu()
@@ -80,6 +78,8 @@ class User(MessageUser):
             self.show_help()
 
         elif self.bot_context == context_name.home:
+            if postback == postback_name.show_menu:
+                self.show_menu()
             if postback == postback_name.start_chatting:
                 self.pair()
             elif postback == postback_name.set_favourite:
@@ -89,12 +89,16 @@ class User(MessageUser):
                 self.changed_favourite(self.favourite)
                 self.show_menu()
                 self.save()
+            else:
+                self.show_help()
 
         elif self.bot_context == context_name.chatting:
             if postback == postback_name.stop_chatting:
                 self.unpair()
             elif postback == postback_name.request_stop_chatting:
                 self.show_end()
+            else:
+                self.send_bot_message("Không phải bây giờ", "Hãy cài đặt sau khi kết thúc cuộc trò chuyện")
 
         elif self.bot_context == context_name.queuing:
             if postback == postback_name.cancel_queuing:
@@ -102,4 +106,4 @@ class User(MessageUser):
                 self.stop_queuing()
                 self.save()
             else:
-                self.still_queuing()
+                self.send_bot_message("Không phải bây giờ", "Hãy cài đặt sau khi rời khỏi hàng đợi")
