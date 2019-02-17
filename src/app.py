@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 import sys
 import logging
 
-logging.basicConfig(filename="hs.log")
 load_dotenv()
 
 from model.API.FBAPI import FBAPI
