@@ -19,15 +19,17 @@ class DBUser:
         self.messenger_id = user_messenger_id
         if not do_fetch:
             return
-        cursor = db.create_cursor()
-        cursor.execute("select * from user where messenger_id = %(messenger_id)s", {
+        cnx = db.get_connection()
+        cursor = cnx.cursor()
+        db.execute_query(cursor, cnx, "select * from user where messenger_id = %(messenger_id)s", {
             "messenger_id": user_messenger_id
         })
         data = db.fetch_data(cursor)
-        cursor.close()
         if len(data) > 0:
             for key in data[0]:
                 self.__dict__[key] = data[0][key]
+        cursor.close()
+        cnx.close()
 
     def _fetch_user_data_from_facebook(self):
         data = self._API.get_user_data(self.messenger_id)
@@ -36,7 +38,8 @@ class DBUser:
         self.gender = data["gender"]
 
     def save(self):
-        cursor = db.create_cursor()
+        cnx = db.get_connection()
+        cursor = cnx.cursor()
         query = """update user
                           set 
                             full_name = %(full_name)s,
@@ -57,12 +60,14 @@ class DBUser:
             "favourite": self.favourite,
             "messenger_id": self.messenger_id
         }
-        cursor.execute(query, data)
-        db.commit_change()
+        db.execute_query(cursor, cnx, query, data)
+        cnx.commit()
         cursor.close()
+        cnx.close()
 
     def _insert_user(self):
-        cursor = db.create_cursor()
+        cnx = db.get_connection()
+        cursor = cnx.cursor()
         query = """
                     insert into user 
                           (messenger_id, full_name, gender, avatar, favourite, partner, bot_context) 
@@ -75,22 +80,27 @@ class DBUser:
             "avatar": self.avatar,
             "context": context_name.home
         }
-        cursor.execute(query, data)
-        db.commit_change()
+        db.execute_query(cursor, cnx, query, data)
+        cnx.commit()
+        cursor.close()
+        cnx.close()
 
     @staticmethod
     def check_exist(messenger_id):
-        cursor = db.create_cursor()
-        cursor.execute("select messenger_id from user where messenger_id = %(messenger_id)s", {
+        cnx = db.get_connection()
+        cursor = cnx.cursor()
+        db.execute_query(cursor, cnx, "select messenger_id from user where messenger_id = %(messenger_id)s", {
             "messenger_id": messenger_id
         })
         res = len(cursor.fetchall()) > 0
         cursor.close()
+        cnx.close()
         return res
 
     @staticmethod
     def _lookup(gender, favourite):
-        cursor = db.create_cursor()
+        cnx = db.get_connection()
+        cursor = cnx.cursor()
         query = """
         select messenger_id from user 
             where bot_context = %(context)s 
@@ -103,9 +113,10 @@ class DBUser:
             "gender": gender,
             "favourite": favourite
         }
-        cursor.execute(query, data)
+        db.execute_query(cursor, cnx, query, data)
         data = db.fetch_data(cursor)
         cursor.close()
+        cnx.close()
         if len(data) == 0:
             return None
         return data[0]["messenger_id"]
