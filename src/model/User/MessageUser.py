@@ -1,7 +1,6 @@
 import const.postback_name as postback_name
 from const import context_name
 from model.User.MongoUser import MongoUser
-# from model.User.SQLUser import SQLUser
 
 
 def make_button(title, payload):
