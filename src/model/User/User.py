@@ -9,7 +9,7 @@ class User(MessageUser):
             super().__init__(user_messenger_id, False)
             self._fetch_user_data_from_facebook()
             self._insert_user()
-            self.send_bot_message("Chào mừng", "Chào mừng bạn đã đến với CSP Heartsync")
+            self.send_bot_message("Chào mừng", "Chào mừng bạn đã đến với CSP Heartsync. Nhớ xem hướng dẫn nhé")
         super().__init__(user_messenger_id)
 
     def pair(self):
