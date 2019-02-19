@@ -3,7 +3,7 @@ import db.mysql as db
 from model.API import FBAPI
 
 
-class DBUser:
+class SQLUser:
     messenger_id = None
     avatar = None
     full_name = "John Doe"

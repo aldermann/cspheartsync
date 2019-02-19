@@ -59,7 +59,10 @@ class User(MessageUser):
             else:
                 if message.lower() == "end chat":
                     self.show_end()
-                self.forward_text_message(message)
+                if message.lower() == "just end chat":
+                    self.unpair()
+                else:
+                    self.forward_text_message(message)
         elif self.bot_context == context_name.queuing:
             if message == "cancel":
                 self.bot_context = context_name.home

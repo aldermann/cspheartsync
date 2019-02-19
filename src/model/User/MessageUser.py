@@ -1,6 +1,7 @@
 import const.postback_name as postback_name
 from const import context_name
-from model.User.DBUser import DBUser
+from model.User.MongoUser import MongoUser
+from model.User.SQLUser import SQLUser
 
 
 def make_button(title, payload):
@@ -20,7 +21,7 @@ def make_quick_replies(title, payload, image_url):
     }
 
 
-class MessageUser(DBUser):
+class MessageUser(MongoUser):
     def send_text_message(self, message, quick_replies=None):
         self._API.send_text_message(self.messenger_id, message, quick_replies)
 

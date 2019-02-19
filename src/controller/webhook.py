@@ -65,4 +65,5 @@ def webhook_post():
                                           "There has been an error. Please report this id: {} to admin".format(key))
                     logging.error(str(key))
                     logging.error(str(e))
+                    # raise e
     return "EVENT_RECEIVED", 200

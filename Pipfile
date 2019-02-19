@@ -11,6 +11,7 @@ python-dotenv = "*"
 gunicorn = "*"
 flask-pymongo = "*"
 mysql-connector = "*"
+pylibmc = "*"
 
 [dev-packages]
 
