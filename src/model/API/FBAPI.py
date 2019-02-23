@@ -29,7 +29,8 @@ class FBAPI(APIInterface):
         }
         response = requests.post(url, json=data)
         if response.status_code != 200:
-            print(response.json()["error"]["message"])
+            if response.json()["error"]["code"] == 10 and response.json()["error"]["subcode"] == 2018065:
+                return "24h limit error"
             raise Exception(response.text, data)
         return response.json()
 
