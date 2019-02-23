@@ -29,6 +29,7 @@ class FBAPI(APIInterface):
         }
         response = requests.post(url, json=data)
         if response.status_code != 200:
+            print(response.json()["error"]["message"])
             raise Exception(response.text, data)
         return response.json()
 
