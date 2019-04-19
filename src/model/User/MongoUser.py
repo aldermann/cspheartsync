@@ -89,7 +89,7 @@ class MongoUser:
 
         if favourite != "any":
             query["$and"].append({"gender": favourite})
-        print (mongo.db["user"].find(query))
+        print (mongo.db["user"].find(query)[0])
         data = mongo.db["user"].find(query).sort("enqueue_time",pymongo.ASCENDING)[0]
         if data is None:
             return data
