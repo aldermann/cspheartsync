@@ -116,8 +116,9 @@ class MessageUser(MongoUser):
         self.send_bot_message("Hủy tìm kiếm", "Bạn đã hủy việc tìm kiếm người trò chuyện")
         self.show_menu()
 
-    def start_chatting(self):
-        self.send_bot_message("Đã ghép cặp", "Hãy bắt đầu cuộc trò chuyện của bạn")
+    def start_chatting(self, partner_gender):
+        gender_string = "nam" if partner_gender == "male" else "nữ"
+        self.send_bot_message("Đã ghép cặp với một bạn {}".format(gender_string), "Hãy bắt đầu cuộc trò chuyện của bạn")
 
     def stop_chatting(self, is_stopper):
         if is_stopper:

@@ -23,13 +23,13 @@ class User(MessageUser):
             self.partner = partner_id
             self.bot_context = context_name.chatting
             self.enqueue_time = None;
-            self.start_chatting()
+            self.start_chatting(partner.gender)
             self.save()
             partner = User(partner_id)
             partner.partner = self.messenger_id
             partner.bot_context = context_name.chatting
             partner.enqueue_time = None;
-            partner.start_chatting()
+            partner.start_chatting(self.gender)
             partner.save()
 
     def unpair(self):
