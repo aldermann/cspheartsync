@@ -20,17 +20,17 @@ class User(MessageUser):
             self.save()
             self.start_queuing()
         else:
-            self.partner = partner_id
-            self.bot_context = context_name.chatting
-            self.enqueue_time = None;
-            self.start_chatting(partner.gender)
-            self.save()
             partner = User(partner_id)
             partner.partner = self.messenger_id
             partner.bot_context = context_name.chatting
             partner.enqueue_time = None;
             partner.start_chatting(self.gender)
             partner.save()
+            self.partner = partner_id
+            self.bot_context = context_name.chatting
+            self.enqueue_time = None
+            self.start_chatting(partner.gender)
+            self.save()
 
     def unpair(self):
         partner = User(self.partner)
