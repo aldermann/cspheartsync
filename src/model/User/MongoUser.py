@@ -90,6 +90,6 @@ class MongoUser:
         if favourite != "any":
             query["$and"].append({"gender": favourite})
         query_result = mongo.db["user"].find(query).sort("enqueue_time", pymongo.ASCENDING)
-        if query_result.count() > 0:
-            return query_result[0]
-        return data["messenger_id"]
+        if query_result.count() == 0:
+            return None
+        return query_result[0]["messenger_id"]
