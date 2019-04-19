@@ -11,6 +11,7 @@ class MongoUser:
     favourite = "any"
     bot_context = context_name.home
     partner = None
+    enqueue_time = None
 
     _API = None
 
@@ -40,7 +41,8 @@ class MongoUser:
             "avatar": self.avatar,
             "partner": self.partner,
             "bot_context": self.bot_context,
-            "favourite": self.favourite
+            "favourite": self.favourite,
+            "enqueue_time": self.enqueue_time
         }
         mongo.db["user"].update_one({
             'messenger_id': self.messenger_id
@@ -86,7 +88,8 @@ class MongoUser:
 
         if favourite != "any":
             query["$and"].append({"gender": favourite})
-        data = mongo.db["user"].find_one(query)
+
+        data = mongo.db.["user"].find(query).sort("enqueue_time",pymongo.ASCENDING).limit(1)[0]
         if data is None:
             return data
         return data["messenger_id"]

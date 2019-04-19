@@ -1,7 +1,7 @@
 import const.postback_name as postback_name
 import const.context_name as context_name
 from model.User.MessageUser import MessageUser
-
+import time
 
 class User(MessageUser):
     def __init__(self, user_messenger_id, create_new=False):
@@ -16,16 +16,19 @@ class User(MessageUser):
         partner_id = User._lookup(self.gender, self.favourite)
         if partner_id is None:
             self.bot_context = context_name.queuing
+            self.enqueue_time = time.time()
             self.save()
             self.start_queuing()
         else:
             self.partner = partner_id
             self.bot_context = context_name.chatting
+            self.enqueue_time = None;
             self.start_chatting()
             self.save()
             partner = User(partner_id)
             partner.partner = self.messenger_id
             partner.bot_context = context_name.chatting
+            partner.enqueue_time = None;
             partner.start_chatting()
             partner.save()
 

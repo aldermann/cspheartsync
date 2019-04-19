@@ -24,6 +24,7 @@ def init():
                            `avatar` varchar(256) not NULL,
                            `favourite` enum('male', 'female', 'any') not NULL default 'any',
                            `partner` bigint(15) ,
+                           `enqueue_time` bigint(15) ,
                            `bot_context` varchar(64) default 'home',
                            primary key (`messenger_id`)
                        );
